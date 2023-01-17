@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -25,7 +27,8 @@ class FilmControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired FilmController filmController;
+    @Autowired
+    FilmController filmController;
 
 
     @SneakyThrows
@@ -124,8 +127,9 @@ class FilmControllerTest {
     }
 
     private Film createFilm() {
+        InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
         Film film = new Film("Alien", "A science-fiction horror", LocalDate.of(1979, 05,25), 116);
-        return filmController.storage.addNewFilm(film);
+        return inMemoryFilmStorage.addNewFilm(film);
     }
 
 }

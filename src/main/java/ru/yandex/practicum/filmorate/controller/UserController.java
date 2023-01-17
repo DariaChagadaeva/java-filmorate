@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class UserController {
     @Autowired
-    InMemoryUserStorage storage;
+    private InMemoryUserStorage storage;
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
@@ -55,10 +55,7 @@ public class UserController {
     }
 
     void validateUser(User user) {
-        if(user.getEmail().isEmpty() || user.getEmail() == null || !(user.getEmail().contains("@"))) {
-            throw new ValidationException("User email invalid");
-        }
-        if(user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
+        if(user.getLogin().contains(" ")) {
             throw new ValidationException("User login invalid");
         }
         if(user.getBirthday().isAfter(LocalDate.now())) {

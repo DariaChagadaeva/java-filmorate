@@ -19,8 +19,7 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     @Autowired
-    InMemoryFilmStorage storage;
-    private final int MAX_NAME_SIZE = 200;
+    private InMemoryFilmStorage storage;
     private final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @PostMapping
@@ -57,17 +56,8 @@ public class FilmController {
     }
 
     void validateFilm(Film film) {
-        if(film.getName() == null || film.getName().isEmpty()) {
-            throw new ValidationException("Film name invalid");
-        }
-        if(film.getDescription() != null && film.getDescription().length() > MAX_NAME_SIZE) {
-            throw new ValidationException("Film description invalid");
-        }
         if(film.getReleaseDate() == null || film.getReleaseDate().isBefore(RELEASE_DATE)) {
             throw new ValidationException("Film release date invalid");
-        }
-        if(film.getDuration() <= 0) {
-            throw new ValidationException("Film duration invalid");
         }
     }
 }
