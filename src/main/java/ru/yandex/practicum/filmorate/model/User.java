@@ -1,18 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Builder
 public class User {
-    private int id;
+    private long id;
     @Email
     @NotBlank
     private String email;
@@ -20,17 +21,20 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private final Set<Long> friends = new HashSet<>();
 
-    public User(String email, String login, String name, LocalDate birthday) {
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
+    public void addFriend(long friendId) {
+        if(friends.contains(friendId)) {
+            throw new UserAlreadyExistException("This user has already added to your friends list");
+        }
+        friends.add(friendId);
     }
 
-    public User(String email, String login, LocalDate birthday) {
-        this.email = email;
-        this.login = login;
-        this.birthday = birthday;
+    public void deleteFriend(long friendId) {
+        if(!friends.contains(friendId)) {
+            throw new NoSuchUserException("This user isn't in your friends list");
+        }
+        friends.remove(friendId);
     }
+
 }

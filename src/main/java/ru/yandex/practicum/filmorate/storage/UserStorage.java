@@ -8,5 +8,6 @@ public interface UserStorage {
     User addNewUser(User user);
     User updateUser(User user);
     List<User> getUsers();
-    int generateId();
+    long generateId();
+    User findUserById(long userId);
 }

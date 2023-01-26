@@ -2,13 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -18,41 +15,53 @@ import java.util.List;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
+    private final FilmService filmService;
+
     @Autowired
-    private InMemoryFilmStorage storage;
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
+
     private final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        try {
             validateFilm(film);
             log.info("Creating film {}", film);
-            return storage.addNewFilm(film);
-        } catch (ValidationException e) {
-            log.debug(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+            return filmService.addNewFilm(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        try {
             log.info("Updating film {}", film);
-            return storage.updateFilm(film);
-        } catch (NoSuchFilmException e) {
-            log.debug("The film does not exist");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The film does not exist");
-        } catch (ValidationException e) {
-            log.debug(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+            return filmService.updateFilm(film);
     }
 
     @GetMapping
     public List<Film> getAll() {
-        final List<Film> films = storage.getFilms();
+        final List<Film> films = filmService.getFilms();
         log.info("Get all films {}", films.size());
         return films;
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable("id") long filmId) {
+        return filmService.findFilmById(filmId);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@PathVariable("id") long filmId, @PathVariable long userId) {
+        return filmService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film deleteLike(@PathVariable("id") long filmId, @PathVariable long userId) {
+        return filmService.deleteLike(filmId, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilmsListWithCount(@RequestParam(defaultValue = "10", required = false) long count) {
+            return filmService.getMostPopularFilms(count);
     }
 
     void validateFilm(Film film) {

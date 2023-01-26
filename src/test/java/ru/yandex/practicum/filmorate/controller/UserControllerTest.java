@@ -31,7 +31,9 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void testCreateUser() {
-        User user = new User("ivanivanov@yandex.ru", "ivan1234", "ivan", LocalDate.of(1980, 05, 15));
+        User user = User.builder()
+                .email("ivanivanov@yandex.ru").login("ivan1234").name("ivan")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
         mockMvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -42,8 +44,24 @@ class UserControllerTest {
 
     @SneakyThrows
     @Test
+    void testFailName() {
+        User user = User.builder()
+                .email("ivanivanov@yandex.ru").login("ivan1234").name("")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
+        mockMvc.perform(post("/users")
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpectAll(status().isOk(),
+                        (result -> content().contentType(MediaType.APPLICATION_JSON)));
+    }
+
+    @SneakyThrows
+    @Test
     void testFailEmail() {
-        User user = new User("ivanivanovyandex.ru", "ivan1234", "ivan", LocalDate.of(1980, 05, 15));
+        User user = User.builder()
+                .email("ivanivanovyandex.ru").login("ivan1234").name("ivan")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
         mockMvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -54,7 +72,9 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void testFailLogin() {
-        User user = new User("ivanivanov@yandex.ru", "ivan 1234", "ivan", LocalDate.of(1980, 05, 15));
+        User user = User.builder()
+                .email("ivanivanov@yandex.ru").login("ivan 1234").name("ivan")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
         mockMvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -65,7 +85,9 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void testFailBirthday() {
-        User user = new User("ivanivanov@yandex.ru", "ivan1234", "ivan", LocalDate.of(2050, 05, 15));
+        User user = User.builder()
+                .email("ivanivanov@yandex.ru").login("ivan1234").name("ivan")
+                .birthday(LocalDate.of(2050, 05, 15)).build();
         mockMvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -76,8 +98,10 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void testUpdate() {
-        int id = createUser().getId();
-        User userUpdate = new User(id,"ivanivanov@yandex.ru", "ivan1234", "ivanUpdate", LocalDate.of(1980, 05, 15));
+        long id = createUser().getId();
+        User userUpdate = User.builder().id(id)
+                .email("ivanivanov@yandex.ru").login("ivan1234").name("ivanUpdate")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
         mockMvc.perform(put("/users", id)
                         .content(objectMapper.writeValueAsString(userUpdate))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -89,8 +113,10 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void testUpdateUnknown() {
-        int id = createUser().getId();
-        User userUpdate = new User(10,"ivanivanov@yandex.ru", "ivan1234", "ivanUpdate", LocalDate.of(1980, 05, 15));
+        long id = createUser().getId();
+        User userUpdate = User.builder().id(10)
+                .email("ivanivanov@yandex.ru").login("ivan1234").name("ivanUpdate")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
         mockMvc.perform(put("/users", id)
                         .content(objectMapper.writeValueAsString(userUpdate))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -110,7 +136,9 @@ class UserControllerTest {
 
     @Test
     void testWithEmptyName() throws Exception {
-        User user = new User("ivanivanov@yandex.ru", "ivan1234", LocalDate.of(1980, 05, 15));
+        User user = User.builder()
+                .email("ivanivanov@yandex.ru").login("ivan1234")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
         mockMvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -121,7 +149,9 @@ class UserControllerTest {
 
      private User createUser() {
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        User user = new User("ivanivanov@yandex.ru", "ivan1234", "ivan", LocalDate.of(1980, 05, 15));
+        User user = User.builder()
+                .email("ivanivanov@yandex.ru").login("ivan1234").name("ivan")
+                .birthday(LocalDate.of(1980, 05, 15)).build();
         return inMemoryUserStorage.addNewUser(user);
     }
 }

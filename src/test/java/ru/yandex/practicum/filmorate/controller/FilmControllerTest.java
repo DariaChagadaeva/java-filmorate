@@ -9,8 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -30,11 +32,13 @@ class FilmControllerTest {
     @Autowired
     FilmController filmController;
 
-
     @SneakyThrows
     @Test
     void testCreateFilm() {
-        Film film = new Film("Alien", "A science-fiction horror", LocalDate.of(1979, 05,25), 116);
+        Film film = Film.builder().name("Alien")
+                .description("A science-fiction horror")
+                .releaseDate(LocalDate.of(1979, 05,25))
+                .duration(116).build();
         mockMvc.perform(post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -46,7 +50,10 @@ class FilmControllerTest {
     @SneakyThrows
     @Test
     void testFailName() {
-        Film film = new Film("", "A science-fiction horror", LocalDate.of(1979, 05,25), 116);
+        Film film = Film.builder().name("")
+                .description("A science-fiction horror")
+                .releaseDate(LocalDate.of(1979, 05,25))
+                .duration(116).build();
         mockMvc.perform(post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -57,11 +64,14 @@ class FilmControllerTest {
     @SneakyThrows
     @Test
     void testFailDescription() {
-        Film film = new Film("Alien", "Based on a story by O'Bannon and Ronald Shusett, " +
-                "it follows the crew of the commercial space tug Nostromo, who, " +
-                "after coming across a mysterious derelict spaceship on an undiscovered moon, " +
-                "find themselves up against an aggressive and deadly extraterrestrial set " +
-                "loose on the Nostromo.", LocalDate.of(1979, 05,25), 116);
+        Film film = Film.builder().name("Alien")
+                .description("Based on a story by O'Bannon and Ronald Shusett, " +
+                        "it follows the crew of the commercial space tug Nostromo, who, " +
+                        "after coming across a mysterious derelict spaceship on an undiscovered moon, " +
+                        "find themselves up against an aggressive and deadly extraterrestrial set " +
+                        "loose on the Nostromo.")
+                .releaseDate(LocalDate.of(1979, 05,25))
+                .duration(116).build();
         mockMvc.perform(post("/films")
                         .content(objectMapper.writeValueAsString(film))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -72,7 +82,10 @@ class FilmControllerTest {
     @SneakyThrows
     @Test
     void testFailReleaseDate() {
-        Film film = new Film("Alien", "A science-fiction horror", LocalDate.of(1895, 05,25), 116);
+        Film film = Film.builder().name("Alien")
+                .description("A science-fiction horror")
+                .releaseDate(LocalDate.of(1895, 05,25))
+                .duration(116).build();
         mockMvc.perform(post("/films")
                         .content(objectMapper.writeValueAsString(film))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -83,7 +96,10 @@ class FilmControllerTest {
     @SneakyThrows
     @Test
     void testFailDuration() {
-        Film film = new Film("Alien", "A science-fiction horror", LocalDate.of(1979, 05,25), -116);
+        Film film = Film.builder().name("Alien")
+                .description("A science-fiction horror")
+                .releaseDate(LocalDate.of(1979, 05,25))
+                .duration(-116).build();
         mockMvc.perform(post("/films")
                         .content(objectMapper.writeValueAsString(film))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -94,8 +110,11 @@ class FilmControllerTest {
     @SneakyThrows
     @Test
     void testUpdate() {
-        int id = createFilm().getId();
-        Film filmUpdate = new Film(id, "Alien", "update description", LocalDate.of(1979, 05,25), 116);
+        long id = createFilm().getId();
+        Film filmUpdate = Film.builder().id(id).name("Alien")
+                .description("update description")
+                .releaseDate(LocalDate.of(1979, 05,25))
+                .duration(116).build();
         mockMvc.perform(put("/films", id)
                         .content(objectMapper.writeValueAsString(filmUpdate))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -107,8 +126,11 @@ class FilmControllerTest {
     @SneakyThrows
     @Test
     void testUpdateUnknown() {
-        int id = createFilm().getId();
-        Film filmUpdate = new Film(15, "Alien", "update description", LocalDate.of(1979, 05,25), 116);
+        long id = createFilm().getId();
+        Film filmUpdate = Film.builder().id(15).name("Alien")
+                .description("A science-fiction horror")
+                .releaseDate(LocalDate.of(1979, 05,25))
+                .duration(116).build();
         mockMvc.perform(put("/films", id)
                         .content(objectMapper.writeValueAsString(filmUpdate))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -128,8 +150,10 @@ class FilmControllerTest {
 
     private Film createFilm() {
         InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
-        Film film = new Film("Alien", "A science-fiction horror", LocalDate.of(1979, 05,25), 116);
+        Film film = Film.builder().name("Alien")
+                .description("A science-fiction horror")
+                .releaseDate(LocalDate.of(1979, 05,25))
+                .duration(116).build();
         return inMemoryFilmStorage.addNewFilm(film);
     }
-
 }
