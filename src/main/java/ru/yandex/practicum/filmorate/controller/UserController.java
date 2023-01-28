@@ -24,7 +24,7 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-            validateUser(user);
+            userService.validateUser(user);
             log.info("Creating user {}", user);
             return userService.addNewUser(user);
     }
@@ -65,14 +65,5 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getFriendsCommonList(@PathVariable("id") long userId, @PathVariable("otherId") long otherUserId) {
         return userService.getFriendsCommonList(userId, otherUserId);
-    }
-
-    void validateUser(User user) {
-        if(user.getLogin().contains(" ")) {
-            throw new ValidationException("User login invalid");
-        }
-        if(user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("User birthday invalid");
-        }
     }
 }

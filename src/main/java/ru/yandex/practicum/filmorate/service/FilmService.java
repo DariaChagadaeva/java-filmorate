@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,7 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
+    private final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     /**Создайте FilmService, который будет отвечать за операции с фильмами,
      * — добавление и удаление лайка, вывод 10 наиболее популярных фильмов по количеству лайков.
@@ -43,6 +46,12 @@ public class FilmService {
                 .limit(count)
                 .collect(Collectors.toList());
         return mostPopularFilms;
+    }
+
+    public void validateFilm(Film film) {
+        if(film.getReleaseDate() == null || film.getReleaseDate().isBefore(RELEASE_DATE)) {
+            throw new ValidationException("Film release date invalid");
+        }
     }
 
     public Film addNewFilm(Film film) {

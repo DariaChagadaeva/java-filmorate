@@ -22,11 +22,9 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    private final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
-
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-            validateFilm(film);
+            filmService.validateFilm(film);
             log.info("Creating film {}", film);
             return filmService.addNewFilm(film);
     }
@@ -62,11 +60,5 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilmsListWithCount(@RequestParam(defaultValue = "10", required = false) long count) {
             return filmService.getMostPopularFilms(count);
-    }
-
-    void validateFilm(Film film) {
-        if(film.getReleaseDate() == null || film.getReleaseDate().isBefore(RELEASE_DATE)) {
-            throw new ValidationException("Film release date invalid");
-        }
     }
 }

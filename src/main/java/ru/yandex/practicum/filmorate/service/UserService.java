@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +65,15 @@ public class UserService {
             }
         }
         return friendsCommonList;
+    }
+
+    public void validateUser(User user) {
+        if(user.getLogin().contains(" ")) {
+            throw new ValidationException("User login invalid");
+        }
+        if(user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("User birthday invalid");
+        }
     }
 
     public User addNewUser(User user) {
