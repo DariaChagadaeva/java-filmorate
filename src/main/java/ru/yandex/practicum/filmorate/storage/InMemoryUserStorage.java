@@ -11,14 +11,14 @@ import java.util.Map;
 
 @Component
 public class InMemoryUserStorage implements UserStorage{
-    private int newId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private long newId = 0;
+    private final Map<Long, User> users = new HashMap<>();
     @Override
     public User addNewUser(User user) {
-        if(user.getName() == null) {
+        if(user.getName() == null || user.getName() == "") {
             user.setName(user.getLogin());
         }
-        final int id = generateId();
+        final long id = generateId();
         user.setId(id);
         users.put(id, user);
         return user;
@@ -40,7 +40,15 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public int generateId() {
+    public long generateId() {
         return ++newId;
+    }
+
+    @Override
+    public User findUserById(long userId) {
+        if(!users.containsKey(userId)) {
+            throw new NoSuchUserException("User does not exist");
+        }
+        return users.get(userId);
     }
 }
