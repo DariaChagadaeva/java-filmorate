@@ -2,14 +2,16 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -21,62 +23,57 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    /**Создайте UserService, который будет отвечать за такие операции с пользователями,
-     * как добавление в друзья, удаление из друзей, вывод списка общих друзей.
-     * Пока пользователям не надо одобрять заявки в друзья — добавляем сразу.
-     * То есть если Лена стала другом Саши, то это значит, что Саша теперь друг Лены.
-     */
-
-    public User addFriend(long userId, long friendId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
-        user.addFriend(friendId);
-        friend.addFriend(userId);
-        userStorage.updateUser(friend);
-        return userStorage.updateUser(user);
+    public void addFriend(long userId, long friendId) {
+        try {
+            userStorage.findUserById(userId);
+            userStorage.findUserById(friendId);
+            userStorage.addFriend(userId, friendId);
+            userStorage.updateUser(userStorage.findUserById(userId));
+        } catch (NoSuchUserException e) {
+            throw new NoSuchUserException("No such user");
+        }
     }
 
-    public User deleteFriend(long userId, long friendId) {
-        User user = userStorage.findUserById(userId);
-        user.deleteFriend(friendId);
-        User friend = userStorage.findUserById(friendId);
-        friend.deleteFriend(userId);
-        return userStorage.updateUser(user);
+    public void deleteFriend(long userId, long friendId) {
+        try {
+            userStorage.findUserById(userId);
+            userStorage.findUserById(friendId);
+            userStorage.deleteFriend(userId, friendId);
+            userStorage.updateUser(userStorage.findUserById(userId));
+        } catch (NoSuchUserException e) {
+            throw new NoSuchUserException("No such user");
+        }
     }
 
     public List<User> getFriendsList(long userId) {
-        User user = userStorage.findUserById(userId);
-        List<User> friendsList = new ArrayList<>();
-        for(Long friendId : user.getFriends()) {
-            friendsList.add(userStorage.findUserById(friendId));
+        try {
+            userStorage.findUserById(userId);
+            return userStorage.getFriendsList(userId);
+        } catch (NoSuchUserException e) {
+            throw new NoSuchUserException("No such user");
         }
-        return friendsList;
     }
 
     public List<User> getFriendsCommonList(long userId, long otherUserId) {
-        User user = userStorage.findUserById(userId);
-        User otherUser = userStorage.findUserById(otherUserId);
-        Set<Long> userFriends = user.getFriends();
-        Set<Long> otherUserFriends = otherUser.getFriends();
-        List<User> friendsCommonList = new ArrayList<>();
-        for (Long userFriendId : userFriends) {
-            if (otherUserFriends.contains(userFriendId)) {
-                friendsCommonList.add(userStorage.findUserById(userFriendId));
-            }
-        }
-        return friendsCommonList;
-    }
-
-    public void validateUser(User user) {
-        if(user.getLogin().contains(" ")) {
-            throw new ValidationException("User login invalid");
-        }
-        if(user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("User birthday invalid");
+        try {
+            userStorage.findUserById(userId);
+            return userStorage.getFriendsCommonList(userId, otherUserId);
+        } catch (NoSuchUserException e) {
+            throw new NoSuchUserException("No such user");
         }
     }
 
     public User addNewUser(User user) {
+        if(user.getName() == null || user.getName() == "") {
+            user.setName(user.getLogin());
+        }
+        validateUser(user);
+        if(user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
+        if(userStorage.getUsers().stream().map(User::getId).collect(Collectors.toSet()).contains(user.getId())) {
+            throw new UserAlreadyExistException("User is already exist");
+        }
         return userStorage.addNewUser(user);
     }
 
@@ -89,6 +86,19 @@ public class UserService {
     }
 
     public User findUserById(long userId) {
-        return userStorage.findUserById(userId);
+        try {
+            return userStorage.findUserById(userId);
+        } catch (NoSuchUserException e) {
+            throw new NoSuchUserException("No such user");
+        }
+    }
+
+    private void validateUser(User user) {
+        if(user.getLogin().contains(" ")) {
+            throw new ValidationException("User login invalid");
+        }
+        if(user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("User birthday invalid");
+        }
     }
 }

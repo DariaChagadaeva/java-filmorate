@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
 import java.nio.file.FileAlreadyExistsException;
@@ -21,7 +18,7 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({NoSuchFilmException.class, NoSuchUserException.class})
+    @ExceptionHandler({NoSuchFilmException.class, NoSuchUserException.class, NoSuchGenreException.class, NoSuchMPAException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());

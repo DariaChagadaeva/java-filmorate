@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.inmemorystorage.InMemoryUserStorage;
 
 
 import java.time.LocalDate;
@@ -148,6 +148,7 @@ class UserControllerTest {
     }
 
      private User createUser() {
+
         InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
         User user = User.builder()
                 .email("ivanivanov@yandex.ru").login("ivan1234").name("ivan")

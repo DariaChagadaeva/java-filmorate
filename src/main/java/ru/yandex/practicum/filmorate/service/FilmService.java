@@ -2,9 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
+import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -13,31 +16,16 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
 
-    private FilmStorage filmStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     private final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
-
-    /**Создайте FilmService, который будет отвечать за операции с фильмами,
-     * — добавление и удаление лайка, вывод 10 наиболее популярных фильмов по количеству лайков.
-     * Пусть пока каждый пользователь может поставить лайк фильму только один раз.
-     */
-
-    public Film addLike(long filmId, long userId) {
-        Film film = filmStorage.findFilmById(filmId);
-        film.addLike(userId);
-        return filmStorage.updateFilm(film);
-    }
-
-    public Film deleteLike(long filmId, long userId) {
-        Film film = filmStorage.findFilmById(filmId);
-        film.deleteLike(userId);
-        return filmStorage.updateFilm(film);
-    }
 
     public List<Film> getMostPopularFilms(long count) {
         List<Film> films = filmStorage.getFilms();
@@ -48,13 +36,8 @@ public class FilmService {
         return mostPopularFilms;
     }
 
-    public void validateFilm(Film film) {
-        if(film.getReleaseDate() == null || film.getReleaseDate().isBefore(RELEASE_DATE)) {
-            throw new ValidationException("Film release date invalid");
-        }
-    }
-
     public Film addNewFilm(Film film) {
+        validateFilm(film);
         return filmStorage.addNewFilm(film);
     }
 
@@ -68,5 +51,25 @@ public class FilmService {
 
     public Film findFilmById(long filmId) {
         return filmStorage.findFilmById(filmId);
+    }
+
+    public void addLike(long filmId, long userId) {
+        filmStorage.addLike(filmId, userId);
+    }
+
+    public void deleteLike(long filmId, long userId) {
+        if(userStorage.findUserById(userId).equals(null)) {
+            throw new NoSuchUserException("No such user");
+        }
+        if(filmStorage.findFilmById(filmId).equals(null)) {
+            throw new NoSuchFilmException("No such film");
+        }
+        filmStorage.deleteLike(filmId, userId);
+    }
+
+    private void validateFilm(Film film) {
+        if(film.getReleaseDate() == null || film.getReleaseDate().isBefore(RELEASE_DATE)) {
+            throw new ValidationException("Film release date invalid");
+        }
     }
 }

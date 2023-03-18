@@ -3,12 +3,10 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,7 +22,6 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-            filmService.validateFilm(film);
             log.info("Creating film {}", film);
             return filmService.addNewFilm(film);
     }
@@ -48,13 +45,13 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film addLike(@PathVariable("id") long filmId, @PathVariable long userId) {
-        return filmService.addLike(filmId, userId);
+    public void addLike(@PathVariable("id") long filmId, @PathVariable long userId) {
+        filmService.addLike(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable("id") long filmId, @PathVariable long userId) {
-        return filmService.deleteLike(filmId, userId);
+    public void deleteLike(@PathVariable("id") long filmId, @PathVariable long userId) {
+        filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/popular")

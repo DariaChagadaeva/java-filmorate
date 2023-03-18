@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
+import ru.yandex.practicum.filmorate.exceptions.GenreAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -21,7 +21,9 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private long duration; //minutes
-    private final Set<Long> likes = new HashSet<>();
+    private Rating mpa;
+    private Set<Genre> genres;
+    private Set<Long> likes;
 
     public void addLike(long userId) {
         if(likes.contains(userId)) {
@@ -37,5 +39,17 @@ public class Film {
         likes.remove(userId);
     }
 
+    public void addGenre(Genre genre) {
+        if(genres.contains(genre.getId())) {
+            throw new GenreAlreadyExistException("Genre has already exist");
+        }
+        genres.add(genre);
+    }
 
+    public void deleteGenre(Genre genre) {
+        if(!genres.contains(genre.getId())) {
+            throw new GenreAlreadyExistException("Genre has already remove");
+        }
+        genres.remove(genre);
+    }
 }
