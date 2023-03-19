@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 
@@ -29,8 +27,8 @@ public class UserService {
             userStorage.findUserById(friendId);
             userStorage.addFriend(userId, friendId);
             userStorage.updateUser(userStorage.findUserById(userId));
-        } catch (NoSuchUserException e) {
-            throw new NoSuchUserException("No such user");
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("No such user");
         }
     }
 
@@ -40,8 +38,8 @@ public class UserService {
             userStorage.findUserById(friendId);
             userStorage.deleteFriend(userId, friendId);
             userStorage.updateUser(userStorage.findUserById(userId));
-        } catch (NoSuchUserException e) {
-            throw new NoSuchUserException("No such user");
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("No such user");
         }
     }
 
@@ -49,8 +47,8 @@ public class UserService {
         try {
             userStorage.findUserById(userId);
             return userStorage.getFriendsList(userId);
-        } catch (NoSuchUserException e) {
-            throw new NoSuchUserException("No such user");
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("No such user");
         }
     }
 
@@ -58,8 +56,8 @@ public class UserService {
         try {
             userStorage.findUserById(userId);
             return userStorage.getFriendsCommonList(userId, otherUserId);
-        } catch (NoSuchUserException e) {
-            throw new NoSuchUserException("No such user");
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("No such user");
         }
     }
 
@@ -72,7 +70,7 @@ public class UserService {
             user.setFriends(new HashSet<>());
         }
         if(userStorage.getUsers().stream().map(User::getId).collect(Collectors.toSet()).contains(user.getId())) {
-            throw new UserAlreadyExistException("User is already exist");
+            throw new EntityAlreadyExistsException("User is already exist");
         }
         return userStorage.addNewUser(user);
     }
@@ -88,8 +86,8 @@ public class UserService {
     public User findUserById(long userId) {
         try {
             return userStorage.findUserById(userId);
-        } catch (NoSuchUserException e) {
-            throw new NoSuchUserException("No such user");
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("No such user");
         }
     }
 

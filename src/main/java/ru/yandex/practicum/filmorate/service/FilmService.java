@@ -3,8 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
@@ -59,10 +58,10 @@ public class FilmService {
 
     public void deleteLike(long filmId, long userId) {
         if(userStorage.findUserById(userId).equals(null)) {
-            throw new NoSuchUserException("No such user");
+            throw new EntityNotFoundException("No such user");
         }
         if(filmStorage.findFilmById(filmId).equals(null)) {
-            throw new NoSuchFilmException("No such film");
+            throw new EntityNotFoundException("No such film");
         }
         filmStorage.deleteLike(filmId, userId);
     }

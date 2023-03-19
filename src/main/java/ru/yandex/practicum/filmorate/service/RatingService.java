@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.RatingDao;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchMPAException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.List;
@@ -24,8 +24,8 @@ public class RatingService {
     public Rating getRatingById(long id) {
         try {
             return ratingStorage.getRatingById(id);
-        } catch (NoSuchMPAException e) {
-            throw new NoSuchMPAException("No such rating");
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("No such rating");
 
         }
     }

@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.dao.RatingDao;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -69,7 +67,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         if(!getFilms().stream().map(Film::getId).collect(Collectors.toSet()).contains(film.getId())) {
-            throw new NoSuchFilmException("No such film");
+            throw new EntityNotFoundException("No such film");
         } else {
             jdbcTemplate.update("UPDATE films " +
                             "SET name = ?, description = ?, release_date = ?, duration = ?, " +
@@ -123,14 +121,14 @@ public class FilmDbStorage implements FilmStorage {
                                 "JOIN rating r using(rating_id) " +
                                 "WHERE film_id = ?"
                 , (rs, rowNum) -> makeFilm(rs), filmId)
-                .stream().findFirst().orElseThrow(() -> {throw new NoSuchFilmException("No such film");
+                .stream().findFirst().orElseThrow(() -> {throw new EntityNotFoundException("No such film");
         });
     }
 
     @Override
     public void addLike(long filmId, long userId) {
         if(getFilmLikes(filmId).contains(userId)) {
-            throw new FilmAlreadyExistException("User has already liked this film");
+            throw new EntityAlreadyExistsException("User has already liked this film");
         } else {
             jdbcTemplate.update("INSERT INTO film_likes values(?, ?)", filmId, userId);
         }

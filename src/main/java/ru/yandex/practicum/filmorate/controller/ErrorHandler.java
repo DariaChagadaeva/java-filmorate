@@ -18,13 +18,13 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({NoSuchFilmException.class, NoSuchUserException.class, NoSuchGenreException.class, NoSuchMPAException.class})
+    @ExceptionHandler({EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({UserAlreadyExistException.class, FileAlreadyExistsException.class})
+    @ExceptionHandler({EntityAlreadyExistsException.class, FileAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         return new ErrorResponse("Произошла непредвиденная ошибка.");

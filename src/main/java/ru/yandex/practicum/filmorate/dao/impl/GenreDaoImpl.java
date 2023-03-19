@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchGenreException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
@@ -29,7 +29,7 @@ public class GenreDaoImpl implements GenreDao {
     public Genre getGenreById(long genreId) {
         return jdbcTemplate.query("select * from genre where genre_id = ?",
                         (rs, rowNum) -> makeGenre(rs), genreId).stream().findFirst().orElseThrow(() -> {
-                    throw new NoSuchGenreException("No such genre");
+                    throw new EntityNotFoundException("No such genre");
                 });
     }
 

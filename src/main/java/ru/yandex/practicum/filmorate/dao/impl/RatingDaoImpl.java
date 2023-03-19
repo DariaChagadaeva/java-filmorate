@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.RatingDao;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchMPAException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
@@ -27,7 +27,7 @@ public class RatingDaoImpl implements RatingDao {
     public Rating getRatingById(long id) {
         return jdbcTemplate.query("select * from rating where rating_id = ?", (rs, rowNum) -> makeRating(rs), id)
                 .stream().findFirst().orElseThrow(() -> {
-                    throw new NoSuchMPAException("No such rating");
+                    throw new EntityNotFoundException("No such rating");
                 });
     }
 

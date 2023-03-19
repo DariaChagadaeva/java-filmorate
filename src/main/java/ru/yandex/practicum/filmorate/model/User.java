@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
+import ru.yandex.practicum.filmorate.exceptions.EntityAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -24,14 +24,14 @@ public class User {
 
     public void addFriend(long friendId) {
         if(friends.contains(friendId)) {
-            throw new UserAlreadyExistException("This user has already added to your friends list");
+            throw new EntityAlreadyExistsException("This user has already added to your friends list");
         }
         friends.add(Friendship.builder().friendId(friendId).status(false).build());
     }
 
     public void deleteFriend(long friendId) {
         if(!friends.contains(friendId)) {
-            throw new NoSuchUserException("This user isn't in your friends list");
+            throw new EntityNotFoundException("This user isn't in your friends list");
         }
         friends.remove(friendId);
     }

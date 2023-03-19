@@ -8,7 +8,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
 
 import java.sql.Date;
@@ -50,7 +50,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (!getUsers().stream().map(User::getId).collect(Collectors.toSet()).contains(user.getId())) {
-            throw new NoSuchUserException("No such user");
+            throw new EntityNotFoundException("No such user");
         } else {
         jdbcTemplate.update("UPDATE users SET name = ?, login = ?, email = ?, birthday = ? " +
                 "WHERE user_id = ?", user.getName(), user.getLogin(), user.getEmail(), user.getBirthday(), user.getId());
@@ -68,7 +68,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User findUserById(long userId) {
         return jdbcTemplate.query("SELECT * FROM users WHERE user_id = ?", (rs, rowNum) -> makeUser(rs), userId)
-                .stream().findFirst().orElseThrow(() -> {throw new NoSuchUserException("No such user");
+                .stream().findFirst().orElseThrow(() -> {throw new EntityNotFoundException("No such user");
                 });
     }
 

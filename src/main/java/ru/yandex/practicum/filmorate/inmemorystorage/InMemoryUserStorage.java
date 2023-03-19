@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.inmemorystorage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -26,7 +26,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if(users.get(user.getId()) == null) {
-            throw new NoSuchUserException("No such user exists");
+            throw new EntityNotFoundException("No such user exists");
         } else {
             users.put(user.getId(), user);
             return user;
@@ -42,7 +42,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User findUserById(long userId) {
         if(!users.containsKey(userId)) {
-            throw new NoSuchUserException("User does not exist");
+            throw new EntityNotFoundException("User does not exist");
         }
         return users.get(userId);
     }

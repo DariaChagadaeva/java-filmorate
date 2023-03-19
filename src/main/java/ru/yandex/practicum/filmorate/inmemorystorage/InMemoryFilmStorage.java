@@ -2,8 +2,7 @@ package ru.yandex.practicum.filmorate.inmemorystorage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         if(films.get(film.getId()) == null) {
-            throw new NoSuchFilmException("No such film exists");
+            throw new EntityNotFoundException("No such film exists");
         } else {
             films.put(film.getId(), film);
             return film;
@@ -41,7 +40,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film findFilmById(long filmId) {
         if(!films.containsKey(filmId)) {
-            throw new NoSuchUserException("Film does not exist");
+            throw new EntityNotFoundException("Film does not exist");
         }
         return films.get(filmId);
     }

@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchGenreException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
@@ -23,8 +23,8 @@ public class GenreService {
     public Genre getGenreById(long genreId){
         try {
             return genreStorage.getGenreById(genreId);
-        } catch (NoSuchGenreException e) {
-            throw new NoSuchGenreException("No such genre");
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("No such genre");
         }
     }
 }
