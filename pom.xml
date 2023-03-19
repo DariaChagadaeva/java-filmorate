@@ -37,9 +37,15 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
+<<<<<<< HEAD
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+=======
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                </dependency>
+>>>>>>> 78e6e5efcaa0c54b25913f70c8dce86968d5b4fc
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
