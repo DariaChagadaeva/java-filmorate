@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -21,21 +19,35 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private long duration; //minutes
-    private final Set<Long> likes = new HashSet<>();
+    private Rating mpa;
+    private Set<Genre> genres;
+    private Set<Long> likes;
 
     public void addLike(long userId) {
         if(likes.contains(userId)) {
-            throw new FilmAlreadyExistException(String.format("User %d has already liked", userId));
+            throw new EntityAlreadyExistsException(String.format("User %d has already liked", userId));
         }
         likes.add(userId);
     }
 
     public void deleteLike(long userId) {
         if(!likes.contains(userId)) {
-            throw new NoSuchUserException(String.format("User %d didn't like film", userId));
+            throw new EntityNotFoundException(String.format("User %d didn't like film", userId));
         }
         likes.remove(userId);
     }
 
+    public void addGenre(Genre genre) {
+        if(genres.contains(genre.getId())) {
+            throw new EntityAlreadyExistsException("Genre has already exist");
+        }
+        genres.add(genre);
+    }
 
+    public void deleteGenre(Genre genre) {
+        if(!genres.contains(genre.getId())) {
+            throw new EntityAlreadyExistsException("Genre has already remove");
+        }
+        genres.remove(genre);
+    }
 }

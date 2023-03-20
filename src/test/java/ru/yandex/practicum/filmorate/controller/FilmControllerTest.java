@@ -9,10 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.inmemorystorage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
 
@@ -38,7 +36,8 @@ class FilmControllerTest {
         Film film = Film.builder().name("Alien")
                 .description("A science-fiction horror")
                 .releaseDate(LocalDate.of(1979, 05,25))
-                .duration(116).build();
+                .duration(116)
+                        .mpa(Rating.builder().id(1).build()).build();
         mockMvc.perform(post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -114,7 +113,8 @@ class FilmControllerTest {
         Film filmUpdate = Film.builder().id(id).name("Alien")
                 .description("update description")
                 .releaseDate(LocalDate.of(1979, 05,25))
-                .duration(116).build();
+                .duration(116)
+                .mpa(Rating.builder().id(1).build()).build();
         mockMvc.perform(put("/films", id)
                         .content(objectMapper.writeValueAsString(filmUpdate))
                         .contentType(MediaType.APPLICATION_JSON))
